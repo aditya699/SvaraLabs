@@ -9,8 +9,11 @@ import {
   Trash2,
   Loader2,
   AudioWaveform,
+  Activity,
 } from "lucide-react";
 import { getRecording, deleteRecording } from "../api/recordings";
+import InteractiveWaveform from "../components/InteractiveWaveform";
+import InteractiveSpectrum from "../components/InteractiveSpectrum";
 
 export default function RecordingDetail() {
   const { id } = useParams();
@@ -113,23 +116,50 @@ export default function RecordingDetail() {
 
       {/* Waveform card */}
       <div className="bg-card rounded-2xl border border-border p-8 sm:p-10 shadow-card">
-        {/* Header */}
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-lg bg-gold/10 flex items-center justify-center">
-            <AudioWaveform className="w-5 h-5 text-gold" />
+        {/* Waveform */}
+        <div className="mb-6">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-8 h-8 rounded-lg bg-gold/10 flex items-center justify-center">
+              <AudioWaveform className="w-4 h-4 text-gold" />
+            </div>
+            <span className="text-xs font-medium px-3 py-1 rounded-full bg-gold/15 text-brown-accent">
+              Waveform
+            </span>
           </div>
-          <span className="text-xs font-medium px-3 py-1 rounded-full bg-gold/15 text-brown-accent">
-            Waveform Analysis
-          </span>
+          {recording.waveform_data ? (
+            <InteractiveWaveform data={recording.waveform_data} />
+          ) : (
+            <div className="rounded-xl overflow-hidden bg-cream">
+              <img
+                src={`data:image/png;base64,${recording.waveform_base64}`}
+                alt="Waveform"
+                className="w-full h-auto block"
+              />
+            </div>
+          )}
         </div>
 
-        {/* Waveform image */}
-        <div className="rounded-xl overflow-hidden bg-cream mb-8">
-          <img
-            src={`data:image/png;base64,${recording.waveform_base64}`}
-            alt="Waveform"
-            className="w-full h-auto block"
-          />
+        {/* Frequency Spectrum */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-8 h-8 rounded-lg bg-gold/10 flex items-center justify-center">
+              <Activity className="w-4 h-4 text-gold" />
+            </div>
+            <span className="text-xs font-medium px-3 py-1 rounded-full bg-gold/15 text-brown-accent">
+              Frequency Spectrum
+            </span>
+          </div>
+          {recording.spectrum_data ? (
+            <InteractiveSpectrum data={recording.spectrum_data} />
+          ) : (
+            <div className="rounded-xl overflow-hidden bg-cream">
+              <img
+                src={`data:image/png;base64,${recording.spectrum_base64}`}
+                alt="Frequency Spectrum"
+                className="w-full h-auto block"
+              />
+            </div>
+          )}
         </div>
 
         <h2 className="text-2xl sm:text-3xl font-serif text-brown mb-6">

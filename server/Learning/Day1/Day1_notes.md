@@ -176,3 +176,57 @@ Loud = big amplitude.
 Quiet = small amplitude.
 High pitch = high frequency.
 Low pitch = low frequency.
+
+
+Your voice is not just ONE frequency at a time.
+When you say "aaah" — your vocal cords vibrate at say 150 times per second. That's your base frequency. Called the fundamental frequency.
+But at the same time — your throat, mouth, nose shape creates additional vibrations on top. Called harmonics. These are higher frequencies happening simultaneously.
+
+You have your waveform. Amplitude over time. That wave is going up and down.
+
+Frequency is simply — how many times that wave goes up and down in one second.
+
+That's it.
+If it goes up and down 150 times in one second — frequency is 150 Hz.
+If it goes up and down 300 times in one second — frequency is 300 Hz.
+Hz just means "times per second."
+
+Now here is the thing.
+Your waveform looks messy right? Not a clean up-down-up-down pattern.
+That's because multiple frequencies are mixed together. Your vocal cords produce 150 Hz. Your mouth shape adds 300 Hz on top. Your nose adds 600 Hz on top of that.
+All mixed into one messy wave.
+
+The fundamental frequency — the base — comes from your vocal cords vibrating speed.
+
+The harmonics on top — come from the shape of your throat, mouth, nasal cavity. These are called your vocal tract. This is what makes your voice sound uniquely yours.
+
+Your voice is never one single frequency. It is always multiple frequencies mixed together. That is a physics fact.
+The fundamental frequency — the base — comes from your vocal cords vibrating speed.
+The harmonics on top — come from the shape of your throat, mouth, nasal cavity. These are called your vocal tract. This is what makes your voice sound uniquely yours.
+
+Amplitude = how much membrane moved = loudness.
+Frequency = how many times per second = pitch.
+Harmonics = multiple frequencies mixed together = the unique character of your voice.
+
+And that fingerprint is exactly what voice cloning needs.
+To clone someone's voice — you need to know their frequency fingerprint. What makes their voice theirs.
+You cannot get that from the raw waveform. You need DFT first.
+
+You have a messy wave. Many frequencies mixed together.
+DFT asks one question for each frequency:
+"How much of THIS frequency is hiding inside this wave?"
+It does that for every possible frequency. One by one.
+And builds a picture — this much 150 Hz, this much 300 Hz, this much 600 Hz and so on.
+
+
+That's the output of DFT.
+X axis — frequency (which sine waves are present).
+Y axis — how much of each frequency is present.
+
+So instead of "amplitude over time" — you get "how much of each frequency."
+That chart is called a frequency spectrum.
+
+Discrete Fourier Transform.
+Discrete — because your audio is not continuous. It is discrete numbers. 48,000 separate measurements per second. Not a smooth continuous wave.
+Fourier — Joseph Fourier. French mathematician. He proved in 1822 that any wave no matter how messy can be broken down into simple sine waves.
+Transform — it transforms your signal from one representation to another. From amplitude vs time → to amplitude vs frequency.

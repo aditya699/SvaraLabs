@@ -5,7 +5,7 @@ from fastapi import APIRouter, File, UploadFile, HTTPException, Query
 
 from server.db.mongo import get_db
 from server.recordings.schemas import RecordingResponse, RecordingListResponse, RecordingListItem
-from server.recordings.utils import decode_audio, generate_waveform_png, png_to_base64
+from server.recordings.utils import decode_audio, generate_waveform_png, generate_spectrum_png, png_to_base64, downsample_waveform, downsample_spectrum
 
 router = APIRouter()
 
@@ -28,11 +28,20 @@ async def create_recording(file: UploadFile = File(...)):
     waveform_png = generate_waveform_png(data, sample_rate)
     waveform_b64 = png_to_base64(waveform_png)
 
+    spectrum_png = generate_spectrum_png(data, sample_rate)
+    spectrum_b64 = png_to_base64(spectrum_png)
+
+    waveform_json = downsample_waveform(data, sample_rate)
+    spectrum_json = downsample_spectrum(data, sample_rate)
+
     doc = {
         "filename": file.filename or "recording.wav",
         "duration_seconds": round(duration, 2),
         "sample_rate": sample_rate,
         "waveform_base64": waveform_b64,
+        "spectrum_base64": spectrum_b64,
+        "waveform_data": waveform_json,
+        "spectrum_data": spectrum_json,
         "created_at": datetime.now(timezone.utc),
     }
 
@@ -46,6 +55,9 @@ async def create_recording(file: UploadFile = File(...)):
         sample_rate=doc["sample_rate"],
         created_at=doc["created_at"],
         waveform_base64=doc["waveform_base64"],
+        spectrum_base64=doc["spectrum_base64"],
+        waveform_data=doc["waveform_data"],
+        spectrum_data=doc["spectrum_data"],
     )
 
 
@@ -67,6 +79,7 @@ async def list_recordings(
                 sample_rate=doc["sample_rate"],
                 created_at=doc["created_at"],
                 waveform_base64=doc["waveform_base64"],
+                spectrum_base64=doc.get("spectrum_base64", ""),
             )
         )
     return RecordingListResponse(recordings=recordings, total=total)
@@ -91,6 +104,9 @@ async def get_recording(recording_id: str):
         sample_rate=doc["sample_rate"],
         created_at=doc["created_at"],
         waveform_base64=doc["waveform_base64"],
+        spectrum_base64=doc.get("spectrum_base64", ""),
+        waveform_data=doc.get("waveform_data"),
+        spectrum_data=doc.get("spectrum_data"),
     )
 
 

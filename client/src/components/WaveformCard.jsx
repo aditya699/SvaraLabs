@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Clock, Calendar } from "lucide-react";
 
 export default function WaveformCard({ recording, index = 0 }) {
-  const { id, filename, duration_seconds, created_at, waveform_base64 } =
+  const { id, filename, duration_seconds, created_at, waveform_base64, spectrum_base64 } =
     recording;
 
   const formatDuration = (s) => {
@@ -38,13 +38,24 @@ export default function WaveformCard({ recording, index = 0 }) {
         to={`/recordings/${id}`}
         className="block bg-card rounded-xl border border-border p-5 sm:p-6 shadow-card hover:shadow-card-hover transition-shadow duration-300 no-underline"
       >
-        {/* Waveform image */}
-        <div className="rounded-xl overflow-hidden bg-cream -mx-1 mb-4">
-          <img
-            src={`data:image/png;base64,${waveform_base64}`}
-            alt={`Waveform for ${filename}`}
-            className="w-full h-auto block"
-          />
+        {/* Charts */}
+        <div className="grid grid-cols-2 gap-2 -mx-1 mb-4">
+          <div className="rounded-xl overflow-hidden bg-cream">
+            <img
+              src={`data:image/png;base64,${waveform_base64}`}
+              alt={`Waveform for ${filename}`}
+              className="w-full h-auto block"
+            />
+          </div>
+          {spectrum_base64 && (
+            <div className="rounded-xl overflow-hidden bg-cream">
+              <img
+                src={`data:image/png;base64,${spectrum_base64}`}
+                alt={`Spectrum for ${filename}`}
+                className="w-full h-auto block"
+              />
+            </div>
+          )}
         </div>
 
         {/* Metadata */}

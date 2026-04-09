@@ -10,6 +10,9 @@ class RecordingResponse(BaseModel):
     sample_rate: int
     created_at: datetime
     waveform_base64: str
+    spectrum_base64: str
+    waveform_data: list[dict] | None = None
+    spectrum_data: list[dict] | None = None
 
 
 class RecordingListItem(BaseModel):
@@ -19,6 +22,7 @@ class RecordingListItem(BaseModel):
     sample_rate: int
     created_at: datetime
     waveform_base64: str
+    spectrum_base64: str
 
 
 class RecordingListResponse(BaseModel):

@@ -8,7 +8,7 @@ This is not a wrapper around existing APIs. Every component is built from scratc
 
 **The North Star:** Give it any voice for 3 seconds and it clones it. Give it any text and it speaks it in that voice. Runs locally. No API keys. No cost. Better than anything open source today.
 
-**Status:** Early development. Stage 1 — audio physics and waveform capture. Voice recording, waveform visualization, and recording CRUD are built. No auth.
+**Status:** Early development. Stage 1 — audio physics, waveform capture, and frequency analysis. Voice recording, waveform visualization, FFT frequency spectrum, interactive chart tooltips, and recording CRUD are built. No auth.
 
 ## Vision & Research Direction
 
@@ -31,7 +31,7 @@ Each stage ships as a feature in the platform. The roadmap is dynamic — stages
 ## Tech Stack
 
 - **Backend:** Python 3.12+, FastAPI, Motor (async MongoDB), matplotlib, numpy, scipy, PyTorch (coming)
-- **Frontend:** React 19, Vite, Tailwind CSS v3, Framer Motion, Lucide React, React Router v7, Axios
+- **Frontend:** React 19, Vite, Tailwind CSS v3, Framer Motion, Recharts, Lucide React, React Router v7, Axios
 - **Database:** MongoDB (Atlas)
 
 ## Project Structure
@@ -45,9 +45,9 @@ SvaraLabs/
 │   ├── db/
 │   │   └── mongo.py               # get_db() singleton via Motor
 │   ├── recordings/
-│   │   ├── routes.py              # CRUD + waveform generation endpoints
+│   │   ├── routes.py              # CRUD + waveform/spectrum generation endpoints
 │   │   ├── schemas.py             # Pydantic request/response models
-│   │   └── utils.py               # matplotlib waveform chart generation
+│   │   └── utils.py               # matplotlib chart generation + audio downsampling
 │   ├── Learning/                  # Research notes & experiments
 │   └── requirements.txt           # Python dependencies
 ├── client/                        # React frontend
@@ -58,11 +58,13 @@ SvaraLabs/
 │   │   ├── components/
 │   │   │   ├── Layout.jsx         # App shell (floating pill navbar + footer)
 │   │   │   ├── Recorder.jsx       # Voice recorder (MediaRecorder API + webm→wav)
-│   │   │   ├── WaveformCard.jsx   # Waveform image + metadata card
+│   │   │   ├── WaveformCard.jsx   # Waveform + spectrum image card (static PNGs)
+│   │   │   ├── InteractiveWaveform.jsx  # Recharts waveform with hover tooltip
+│   │   │   ├── InteractiveSpectrum.jsx  # Recharts spectrum with hover tooltip
 │   │   │   └── RecordingList.jsx  # Grid of recording cards
 │   │   └── pages/
 │   │       ├── Home.jsx           # Recorder + recent recordings grid
-│   │       └── RecordingDetail.jsx # Full waveform view + delete
+│   │       └── RecordingDetail.jsx # Interactive waveform/spectrum view + delete
 │   ├── tailwind.config.js         # Design system
 │   └── vite.config.js             # Vite config with API proxy to :8000
 ├── .env                           # Secrets (gitignored)
@@ -91,8 +93,17 @@ Requires a `.env` file at the project root (copy `.env.sample`).
 ### Voice Recording & Waveform (complete — Stage 1)
 - Browser audio capture via MediaRecorder API (webm) with client-side webm→WAV conversion
 - Upload WAV to backend, scipy decodes audio, matplotlib plots time vs amplitude
-- Waveform PNG stored as base64 in MongoDB alongside recording metadata
+- FFT-based frequency spectrum (0–8 kHz) generated alongside waveform
+- Waveform and spectrum PNGs stored as base64 in MongoDB alongside recording metadata
 - Full CRUD: create (upload + plot), list (paginated), get single, delete
+
+### Interactive Charts (complete — Stage 1)
+- Detail page renders interactive Recharts charts with hover tooltips
+- Waveform tooltip shows exact time (s) and amplitude at cursor position
+- Frequency spectrum tooltip shows exact frequency (Hz) and amplitude at cursor position
+- Backend downsamples audio to ~1500 points for efficient JSON transfer
+- Listing cards keep static PNG images for performance
+- Old recordings (pre-interactive) gracefully fall back to static images
 
 ### Frontend Design System
 - **Colors:** Cream `#FAF7F2` (background), brown `#2D2016` (text), gold `#C4956A` (accents), white cards with subtle borders `#E8E0D4`
@@ -106,7 +117,10 @@ Requires a `.env` file at the project root (copy `.env.sample`).
 ### Audio Pipeline
 - Browser records in webm (MediaRecorder default), converts to WAV client-side using AudioContext + DataView WAV header writer.
 - Backend uses `scipy.io.wavfile.read()` to decode WAV, normalizes to [-1, 1] float64.
-- Matplotlib generates waveform with warm gold color scheme (`#C4956A`) on cream background (`#FAF7F2`) matching the UI, saved to PNG bytes → base64.
+- Matplotlib generates waveform and frequency spectrum PNGs with warm gold color scheme (`#C4956A`) on cream background (`#FAF7F2`) matching the UI, saved to PNG bytes → base64.
+- Backend also downsamples audio to ~1500 data points (waveform: `{t, a}`, spectrum: `{f, a}`) and stores as JSON in MongoDB for interactive frontend charts.
+- Detail page uses Recharts `<AreaChart>` with custom tooltips; listing cards use static base64 PNGs.
+- `RecordingResponse` includes both base64 and JSON data; `RecordingListItem` includes only base64 (no JSON chart data in list endpoint).
 
 ### CORS
 - Currently `allow_origins=["*"]` for development. Tighten for production.
@@ -114,7 +128,7 @@ Requires a `.env` file at the project root (copy `.env.sample`).
 ### API Design
 - All endpoints under `/api/v1/recordings`.
 - Audio upload via multipart form data (`UploadFile`).
-- Waveform stored as base64 in the MongoDB document (no separate file storage for now).
+- Waveform and spectrum stored as base64 in the MongoDB document (no separate file storage for now). Downsampled JSON chart data stored alongside for interactive rendering.
 - Vite dev server proxies `/api` to FastAPI on port 8000 (uses `127.0.0.1` to avoid IPv6 resolution issues).
 
 ## Conventions

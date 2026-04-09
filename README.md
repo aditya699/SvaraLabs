@@ -10,8 +10,9 @@ Svara Labs grows through research — each layer of the audio AI stack becomes a
 
 | Layer | What | Status |
 |-------|------|--------|
-| Audio physics | Waveform capture, time-vs-amplitude visualization | Built |
-| Signal processing | FFT, STFT, mel spectrograms, MFCCs | Coming |
+| Audio physics | Waveform capture, time-vs-amplitude visualization, interactive hover tooltips | Built |
+| Frequency analysis | FFT-based frequency spectrum with interactive visualization | Built |
+| Signal processing | STFT, mel spectrograms, MFCCs | Coming |
 | Deep audio models | CNNs/RNNs on spectrograms, phoneme classification | Coming |
 | Speech recognition | CTC, seq2seq, Whisper fine-tuning | Coming |
 | Neural vocoders | HiFi-GAN, spectrogram-to-speech | Coming |
@@ -23,7 +24,7 @@ Svara Labs grows through research — each layer of the audio AI stack becomes a
 ## Tech Stack
 
 - **Backend:** Python 3.12+, FastAPI, Motor (async MongoDB), matplotlib, numpy, scipy
-- **Frontend:** React 19, Vite, Tailwind CSS v3, Framer Motion, Lucide React, React Router v7, Axios
+- **Frontend:** React 19, Vite, Tailwind CSS v3, Framer Motion, Recharts, Lucide React, React Router v7, Axios
 - **Database:** MongoDB (Atlas or self-hosted)
 - **ML (coming):** PyTorch, torchaudio, HuggingFace
 
@@ -48,7 +49,7 @@ Requires a `.env` file at the project root (copy `.env.sample`).
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `GET` | `/health` | Health check |
-| `POST` | `/api/v1/recordings` | Upload audio, get waveform |
+| `POST` | `/api/v1/recordings` | Upload audio, get waveform + spectrum |
 | `GET` | `/api/v1/recordings` | List recordings (paginated) |
 | `GET` | `/api/v1/recordings/{id}` | Get single recording |
 | `DELETE` | `/api/v1/recordings/{id}` | Delete recording |
@@ -67,7 +68,7 @@ SvaraLabs/
 ├── client/                        # React frontend
 │   ├── src/
 │   │   ├── api/                   # Axios client + API functions
-│   │   ├── components/            # Layout, Recorder, WaveformCard, RecordingList
+│   │   ├── components/            # Layout, Recorder, WaveformCard, InteractiveWaveform, InteractiveSpectrum, RecordingList
 │   │   └── pages/                 # Home, RecordingDetail
 │   ├── tailwind.config.js
 │   └── vite.config.js
