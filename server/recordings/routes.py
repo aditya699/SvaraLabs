@@ -5,7 +5,7 @@ from fastapi import APIRouter, File, UploadFile, HTTPException, Query
 
 from server.db.mongo import get_db
 from server.recordings.schemas import RecordingResponse, RecordingListResponse, RecordingListItem
-from server.recordings.utils import decode_audio, generate_waveform_png, generate_spectrum_png, png_to_base64, downsample_waveform, downsample_spectrum
+from server.recordings.utils import decode_audio, generate_waveform_png, generate_spectrum_png, generate_spectrogram_png, generate_mel_spectrogram_png, png_to_base64, downsample_waveform, downsample_spectrum
 
 router = APIRouter()
 
@@ -31,6 +31,12 @@ async def create_recording(file: UploadFile = File(...)):
     spectrum_png = generate_spectrum_png(data, sample_rate)
     spectrum_b64 = png_to_base64(spectrum_png)
 
+    spectrogram_png = generate_spectrogram_png(data, sample_rate)
+    spectrogram_b64 = png_to_base64(spectrogram_png)
+
+    mel_spectrogram_png = generate_mel_spectrogram_png(data, sample_rate)
+    mel_spectrogram_b64 = png_to_base64(mel_spectrogram_png)
+
     waveform_json = downsample_waveform(data, sample_rate)
     spectrum_json = downsample_spectrum(data, sample_rate)
 
@@ -40,6 +46,8 @@ async def create_recording(file: UploadFile = File(...)):
         "sample_rate": sample_rate,
         "waveform_base64": waveform_b64,
         "spectrum_base64": spectrum_b64,
+        "spectrogram_base64": spectrogram_b64,
+        "mel_spectrogram_base64": mel_spectrogram_b64,
         "waveform_data": waveform_json,
         "spectrum_data": spectrum_json,
         "created_at": datetime.now(timezone.utc),
@@ -56,6 +64,8 @@ async def create_recording(file: UploadFile = File(...)):
         created_at=doc["created_at"],
         waveform_base64=doc["waveform_base64"],
         spectrum_base64=doc["spectrum_base64"],
+        spectrogram_base64=doc["spectrogram_base64"],
+        mel_spectrogram_base64=doc["mel_spectrogram_base64"],
         waveform_data=doc["waveform_data"],
         spectrum_data=doc["spectrum_data"],
     )
@@ -80,6 +90,7 @@ async def list_recordings(
                 created_at=doc["created_at"],
                 waveform_base64=doc["waveform_base64"],
                 spectrum_base64=doc.get("spectrum_base64", ""),
+                spectrogram_base64=doc.get("spectrogram_base64"),
             )
         )
     return RecordingListResponse(recordings=recordings, total=total)
@@ -105,6 +116,8 @@ async def get_recording(recording_id: str):
         created_at=doc["created_at"],
         waveform_base64=doc["waveform_base64"],
         spectrum_base64=doc.get("spectrum_base64", ""),
+        spectrogram_base64=doc.get("spectrogram_base64"),
+        mel_spectrogram_base64=doc.get("mel_spectrogram_base64"),
         waveform_data=doc.get("waveform_data"),
         spectrum_data=doc.get("spectrum_data"),
     )

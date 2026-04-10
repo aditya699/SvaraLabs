@@ -10,6 +10,7 @@ import {
   Loader2,
   AudioWaveform,
   Activity,
+  BarChart3,
 } from "lucide-react";
 import { getRecording, deleteRecording } from "../api/recordings";
 import InteractiveWaveform from "../components/InteractiveWaveform";
@@ -22,6 +23,7 @@ export default function RecordingDetail() {
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState(null);
+  const [spectrogramMode, setSpectrogramMode] = useState("linear");
 
   useEffect(() => {
     (async () => {
@@ -140,7 +142,7 @@ export default function RecordingDetail() {
         </div>
 
         {/* Frequency Spectrum */}
-        <div className="mb-8">
+        <div className="mb-6">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-8 h-8 rounded-lg bg-gold/10 flex items-center justify-center">
               <Activity className="w-4 h-4 text-gold" />
@@ -161,6 +163,55 @@ export default function RecordingDetail() {
             </div>
           )}
         </div>
+
+        {/* Spectrogram */}
+        {recording.spectrogram_base64 && (
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-8 h-8 rounded-lg bg-gold/10 flex items-center justify-center">
+                <BarChart3 className="w-4 h-4 text-gold" />
+              </div>
+              <span className="text-xs font-medium px-3 py-1 rounded-full bg-gold/15 text-brown-accent">
+                Spectrogram
+              </span>
+              {recording.mel_spectrogram_base64 && (
+                <div className="flex items-center gap-1 ml-auto bg-cream border border-border rounded-lg p-0.5">
+                  <button
+                    onClick={() => setSpectrogramMode("linear")}
+                    className={`text-xs font-medium px-3 py-1.5 rounded-md transition-all duration-200 ${
+                      spectrogramMode === "linear"
+                        ? "bg-gold/15 text-brown-accent shadow-sm"
+                        : "text-brown-muted hover:text-brown"
+                    }`}
+                  >
+                    Linear
+                  </button>
+                  <button
+                    onClick={() => setSpectrogramMode("mel")}
+                    className={`text-xs font-medium px-3 py-1.5 rounded-md transition-all duration-200 ${
+                      spectrogramMode === "mel"
+                        ? "bg-gold/15 text-brown-accent shadow-sm"
+                        : "text-brown-muted hover:text-brown"
+                    }`}
+                  >
+                    Mel
+                  </button>
+                </div>
+              )}
+            </div>
+            <div className="rounded-xl overflow-hidden bg-cream">
+              <img
+                src={`data:image/png;base64,${
+                  spectrogramMode === "mel" && recording.mel_spectrogram_base64
+                    ? recording.mel_spectrogram_base64
+                    : recording.spectrogram_base64
+                }`}
+                alt={spectrogramMode === "mel" ? "Mel Spectrogram" : "Spectrogram"}
+                className="w-full h-auto block"
+              />
+            </div>
+          </div>
+        )}
 
         <h2 className="text-2xl sm:text-3xl font-serif text-brown mb-6">
           Recording Details

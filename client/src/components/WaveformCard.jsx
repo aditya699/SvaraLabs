@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Clock, Calendar } from "lucide-react";
 
 export default function WaveformCard({ recording, index = 0 }) {
-  const { id, filename, duration_seconds, created_at, waveform_base64, spectrum_base64 } =
+  const { id, filename, duration_seconds, created_at, waveform_base64, spectrum_base64, spectrogram_base64 } =
     recording;
 
   const formatDuration = (s) => {
@@ -39,19 +39,30 @@ export default function WaveformCard({ recording, index = 0 }) {
         className="block bg-card rounded-xl border border-border p-5 sm:p-6 shadow-card hover:shadow-card-hover transition-shadow duration-300 no-underline"
       >
         {/* Charts */}
-        <div className="grid grid-cols-2 gap-2 -mx-1 mb-4">
-          <div className="rounded-xl overflow-hidden bg-cream">
-            <img
-              src={`data:image/png;base64,${waveform_base64}`}
-              alt={`Waveform for ${filename}`}
-              className="w-full h-auto block"
-            />
-          </div>
-          {spectrum_base64 && (
+        <div className="space-y-2 -mx-1 mb-4">
+          <div className="grid grid-cols-2 gap-2">
             <div className="rounded-xl overflow-hidden bg-cream">
               <img
-                src={`data:image/png;base64,${spectrum_base64}`}
-                alt={`Spectrum for ${filename}`}
+                src={`data:image/png;base64,${waveform_base64}`}
+                alt={`Waveform for ${filename}`}
+                className="w-full h-auto block"
+              />
+            </div>
+            {spectrum_base64 && (
+              <div className="rounded-xl overflow-hidden bg-cream">
+                <img
+                  src={`data:image/png;base64,${spectrum_base64}`}
+                  alt={`Spectrum for ${filename}`}
+                  className="w-full h-auto block"
+                />
+              </div>
+            )}
+          </div>
+          {spectrogram_base64 && (
+            <div className="rounded-xl overflow-hidden bg-cream">
+              <img
+                src={`data:image/png;base64,${spectrogram_base64}`}
+                alt={`Spectrogram for ${filename}`}
                 className="w-full h-auto block"
               />
             </div>
