@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { Outlet, Link } from "react-router-dom";
+import { Outlet, Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { AudioWaveform, ArrowRight } from "lucide-react";
+import { AudioWaveform, ArrowRight, BookOpen } from "lucide-react";
 
 export default function Layout() {
   const [scrolled, setScrolled] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -36,6 +37,17 @@ export default function Layout() {
           </Link>
 
           <div className="flex items-center gap-3">
+            <Link
+              to="/learn"
+              className={`flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-full transition-colors duration-200 no-underline ${
+                location.pathname === "/learn"
+                  ? "bg-gold/15 text-brown-accent"
+                  : "text-brown-muted hover:text-brown"
+              }`}
+            >
+              <BookOpen className="w-3.5 h-3.5" />
+              Learn
+            </Link>
             <span className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1 rounded-full bg-gold/15 text-brown-accent">
               <span className="w-1.5 h-1.5 rounded-full bg-gold animate-pulse" />
               Beta
