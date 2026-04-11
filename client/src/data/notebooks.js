@@ -16,7 +16,7 @@ export const NOTEBOOKS = [
       "CNN Architecture",
       "Training Loop",
     ],
-    notebookPath: "DL/day1.ipynb",
+    notebookPath: "DL/Day1/day1.ipynb",
     estimatedMinutes: 45,
   },
 ];

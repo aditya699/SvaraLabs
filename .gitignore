@@ -206,3 +206,4 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 server/Learning/Day1/AudioAI_Roadmap.docx
+DL/Day1/audio_cnn.pth

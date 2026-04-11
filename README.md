@@ -13,7 +13,7 @@ Svara Labs grows through research — each layer of the audio AI stack becomes a
 | Audio physics | Waveform capture, time-vs-amplitude visualization, interactive hover tooltips | Built |
 | Frequency analysis | FFT-based frequency spectrum with interactive visualization | Built |
 | Signal processing | STFT, mel spectrograms, MFCCs | Coming |
-| Deep audio models | CNNs/RNNs on spectrograms, phoneme classification | Coming |
+| Deep audio models | CNNs/RNNs on spectrograms, phoneme classification | In Progress |
 | Speech recognition | CTC, seq2seq, Whisper fine-tuning | Coming |
 | Neural vocoders | HiFi-GAN, spectrogram-to-speech | Coming |
 | Text-to-speech | FastSpeech, controllable synthesis | Coming |
@@ -54,6 +54,16 @@ Requires a `.env` file at the project root (copy `.env.sample`).
 | `GET` | `/api/v1/recordings/{id}` | Get single recording |
 | `DELETE` | `/api/v1/recordings/{id}` | Delete recording |
 
+## Learn
+
+Svara Labs includes a built-in learning hub at `/learn` with Jupyter notebooks that teach audio AI from scratch. Each notebook is a self-contained lesson you can clone and run locally.
+
+| Notebook | Topics | Difficulty |
+|----------|--------|------------|
+| [Day 1 — Audio AI Fundamentals](DL/Day1/day1.ipynb) | PyTorch setup, Speech Commands dataset, mel spectrograms, CNN audio classifier, training loop | Beginner |
+
+More notebooks coming soon covering signal processing, spectrograms, speech recognition, and beyond.
+
 ## Project Structure
 
 ```
@@ -68,10 +78,14 @@ SvaraLabs/
 ├── client/                        # React frontend
 │   ├── src/
 │   │   ├── api/                   # Axios client + API functions
-│   │   ├── components/            # Layout, Recorder, WaveformCard, InteractiveWaveform, InteractiveSpectrum, RecordingList
-│   │   └── pages/                 # Home, RecordingDetail
+│   │   ├── components/            # Layout, Recorder, WaveformCard, NotebookCard, InteractiveWaveform, InteractiveSpectrum, RecordingList
+│   │   ├── data/                  # Static data (notebook metadata)
+│   │   └── pages/                 # Home, Learn, RecordingDetail
 │   ├── tailwind.config.js
 │   └── vite.config.js
+├── DL/                            # Jupyter notebooks for learning
+│   └── Day1/
+│       └── day1.ipynb             # Audio AI fundamentals (CNN classifier)
 ├── .env.sample                    # Template for .env
 └── .gitignore
 ```
