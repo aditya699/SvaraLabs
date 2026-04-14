@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Headphones } from "lucide-react";
 import Recorder from "../components/Recorder";
+import CommandRecorder from "../components/CommandRecorder";
 import RecordingList from "../components/RecordingList";
 import { listRecordings } from "../api/recordings";
 
@@ -55,6 +56,11 @@ export default function Home() {
       {/* Recorder */}
       <motion.div variants={itemVariants}>
         <Recorder onRecorded={handleRecorded} />
+      </motion.div>
+
+      {/* Command Predictor */}
+      <motion.div variants={itemVariants}>
+        <CommandRecorder />
       </motion.div>
 
       {/* Recordings */}
