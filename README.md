@@ -2,7 +2,7 @@
 
 An open-source audio AI platform built from first principles. Understanding audio as a modality — from raw waveform physics to voice cloning and audio language models. Research-driven, every component implemented from scratch, every milestone shipped as a user-facing feature.
 
-**The goal:** Build an open-source ElevenLabs. Give it any voice for 3 seconds and it clones it. Give it any text and it speaks it in that voice. Runs locally. No API keys. No cost.
+**The North Star:** Understand the audio AI research space fully — every layer of the stack, from waveform physics to audio language models, built and reasoned about from first principles. Shippable products (voice cloning, TTS, STT) are downstream artifacts of that understanding.
 
 ## What We're Building
 
@@ -14,7 +14,8 @@ Svara Labs grows through research — each layer of the audio AI stack becomes a
 | Frequency analysis | FFT-based frequency spectrum with interactive visualization | Built |
 | Signal processing | STFT, mel spectrograms, MFCCs | Coming |
 | Deep audio models | CNNs/RNNs on spectrograms, phoneme classification | In Progress |
-| Speech recognition | CTC, seq2seq, Whisper fine-tuning | Coming |
+| Speech-to-text | Realtime streaming transcription (OpenAI Realtime / gpt-4o-transcribe) | Built |
+| Speech recognition (from scratch) | CTC, seq2seq, Whisper fine-tuning | Coming |
 | Neural vocoders | HiFi-GAN, spectrogram-to-speech | Coming |
 | Text-to-speech | FastSpeech, controllable synthesis | Coming |
 | Audio codecs | EnCodec, RVQ, audio tokenization | Coming |
@@ -53,6 +54,12 @@ Requires a `.env` file at the project root (copy `.env.sample`).
 | `GET` | `/api/v1/recordings` | List recordings (paginated) |
 | `GET` | `/api/v1/recordings/{id}` | Get single recording |
 | `DELETE` | `/api/v1/recordings/{id}` | Delete recording |
+| `POST` | `/api/v1/predictions` | Classify a short spoken command |
+| `WS` | `/api/v1/stt` | Realtime speech-to-text WebSocket proxy to OpenAI Realtime |
+
+### Realtime STT
+
+The `/api/v1/stt` WebSocket accepts `{type: "audio", data: <base64 PCM16 mono @ 16 kHz>}` frames and streams back `{type: "delta", text}` (partial) and `{type: "final", text}` (committed on server VAD). Set `OPENAI_API_KEY` in `.env`. The browser client lives at `/services/stt` and handles mic capture, downsampling, and rendering.
 
 ## Learn
 
@@ -73,14 +80,21 @@ SvaraLabs/
 │   ├── core/                      # Config, settings
 │   ├── db/                        # MongoDB connection
 │   ├── recordings/                # Voice recording CRUD + waveform generation
+│   ├── predictions/               # CNN command classifier
+│   ├── stt/                       # Realtime speech-to-text WebSocket proxy
 │   ├── Learning/                  # Research notes & experiments
 │   └── requirements.txt
 ├── client/                        # React frontend
 │   ├── src/
-│   │   ├── api/                   # Axios client + API functions
-│   │   ├── components/            # Layout, Recorder, WaveformCard, NotebookCard, InteractiveWaveform, InteractiveSpectrum, RecordingList
+│   │   ├── api/                   # Axios client + API functions (recordings, predictions, stt WebSocket)
+│   │   ├── components/            # Layout, Recorder, LiveTranscriber, WaveformCard, NotebookCard, InteractiveWaveform, InteractiveSpectrum, RecordingList
 │   │   ├── data/                  # Static data (notebook metadata)
-│   │   └── pages/                 # Home, Learn, RecordingDetail
+│   │   └── pages/
+│   │       ├── Vision.jsx         # / — landing, mission, research roadmap
+│   │       ├── Services.jsx       # /services — services index
+│   │       ├── services/          # /services/{recordings,commands,stt}
+│   │       ├── Learn.jsx          # /learn
+│   │       └── RecordingDetail.jsx
 │   ├── tailwind.config.js
 │   └── vite.config.js
 ├── DL/                            # Jupyter notebooks for learning

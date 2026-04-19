@@ -9,6 +9,7 @@ from server.predictions.model import load_model, get_model
 from server.predictions.queue import init_queue, get_queue
 from server.predictions.routes import router as predictions_router
 from server.recordings.routes import router as recordings_router
+from server.stt.routes import router as stt_router
 
 
 @asynccontextmanager
@@ -34,6 +35,7 @@ app.add_middleware(
 
 app.include_router(recordings_router, prefix="/api/v1/recordings", tags=["recordings"])
 app.include_router(predictions_router, prefix="/api/v1/predictions", tags=["predictions"])
+app.include_router(stt_router, prefix="/api/v1/stt", tags=["stt"])
 
 
 @app.get("/health")

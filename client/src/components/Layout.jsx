@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Outlet, Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { AudioWaveform, ArrowRight, BookOpen } from "lucide-react";
+import { AudioWaveform, ArrowRight, BookOpen, Sparkles, LayoutGrid } from "lucide-react";
 
 export default function Layout() {
   const [scrolled, setScrolled] = useState(false);
@@ -36,7 +36,29 @@ export default function Layout() {
             <span className="font-serif text-lg text-brown">Svara Labs</span>
           </Link>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1 sm:gap-2">
+            <Link
+              to="/"
+              className={`flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-full transition-colors duration-200 no-underline ${
+                location.pathname === "/"
+                  ? "bg-gold/15 text-brown-accent"
+                  : "text-brown-muted hover:text-brown"
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              Vision
+            </Link>
+            <Link
+              to="/services"
+              className={`flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-full transition-colors duration-200 no-underline ${
+                location.pathname.startsWith("/services") || location.pathname.startsWith("/recordings")
+                  ? "bg-gold/15 text-brown-accent"
+                  : "text-brown-muted hover:text-brown"
+              }`}
+            >
+              <LayoutGrid className="w-3.5 h-3.5" />
+              Services
+            </Link>
             <Link
               to="/learn"
               className={`flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-full transition-colors duration-200 no-underline ${
@@ -48,10 +70,6 @@ export default function Layout() {
               <BookOpen className="w-3.5 h-3.5" />
               Learn
             </Link>
-            <span className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1 rounded-full bg-gold/15 text-brown-accent">
-              <span className="w-1.5 h-1.5 rounded-full bg-gold animate-pulse" />
-              Beta
-            </span>
           </div>
         </div>
       </motion.nav>

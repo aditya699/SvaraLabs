@@ -6,9 +6,9 @@ Svara Labs is an open-source audio AI platform — think of it as a research-dri
 
 This is not a wrapper around existing APIs. Every component is built from scratch, trained on real data, and shipped as a usable product. The platform serves as both a learning lab and a production-grade tool — each research milestone becomes a feature users can interact with.
 
-**The North Star:** Give it any voice for 3 seconds and it clones it. Give it any text and it speaks it in that voice. Runs locally. No API keys. No cost. Better than anything open source today.
+**The North Star:** Understand the audio AI research space fully — every layer of the stack, from waveform physics to audio language models, built and reasoned about from first principles. Shippable products (voice cloning, TTS, STT, etc.) are downstream artifacts of that understanding, not the goal itself.
 
-**Status:** Early development. Stage 1 — audio physics, waveform capture, and frequency analysis. Voice recording, waveform visualization, FFT frequency spectrum, interactive chart tooltips, and recording CRUD are built. No auth.
+**Status:** Early development. Stage 1 — audio physics, waveform capture, and frequency analysis — is built (voice recording, waveform/spectrum visualization, interactive chart tooltips, recording CRUD). A realtime speech-to-text service is also live via a WebSocket proxy to the OpenAI Realtime API (`gpt-4o-transcribe`) — this is a productized shortcut so users have STT today; the from-scratch speech recognition research (CTC, seq2seq) remains a separate upcoming stage. No auth.
 
 ## Vision & Research Direction
 
@@ -30,7 +30,7 @@ Each stage ships as a feature in the platform. The roadmap is dynamic — stages
 
 ## Tech Stack
 
-- **Backend:** Python 3.12+, FastAPI, Motor (async MongoDB), matplotlib, numpy, scipy, PyTorch (coming)
+- **Backend:** Python 3.12+, FastAPI, Motor (async MongoDB), matplotlib, numpy, scipy, PyTorch, `websockets` (for OpenAI Realtime proxy)
 - **Frontend:** React 19, Vite, Tailwind CSS v3, Framer Motion, Recharts, Lucide React, React Router v7, Axios
 - **Database:** MongoDB (Atlas)
 
@@ -44,27 +44,38 @@ SvaraLabs/
 │   │   └── config.py              # Pydantic Settings (reads .env)
 │   ├── db/
 │   │   └── mongo.py               # get_db() singleton via Motor
-│   ├── recordings/
-│   │   ├── routes.py              # CRUD + waveform/spectrum generation endpoints
-│   │   ├── schemas.py             # Pydantic request/response models
-│   │   └── utils.py               # matplotlib chart generation + audio downsampling
+│   ├── recordings/                # CRUD + waveform/spectrum generation (routes/schemas/utils)
+│   ├── predictions/               # CNN spoken-command classifier (routes/model/queue)
+│   ├── stt/                       # Realtime STT WebSocket proxy to OpenAI Realtime
+│   │   ├── routes.py              # /api/v1/stt WS — relays PCM16 chunks to OpenAI, streams deltas back
+│   │   └── schemas.py             # WS message shapes (AudioChunk, Delta, Final, Error)
 │   ├── Learning/                  # Research notes & experiments
 │   └── requirements.txt           # Python dependencies
 ├── client/                        # React frontend
 │   ├── src/
 │   │   ├── api/
 │   │   │   ├── client.js          # Axios instance (baseURL from env)
-│   │   │   └── recordings.js      # Recording CRUD API functions
+│   │   │   ├── recordings.js      # Recording CRUD
+│   │   │   ├── predictions.js     # Command predictions
+│   │   │   └── stt.js             # openSttSocket() — WebSocket helper for realtime STT
 │   │   ├── components/
-│   │   │   ├── Layout.jsx         # App shell (floating pill navbar + footer)
+│   │   │   ├── Layout.jsx         # App shell (floating pill navbar: Vision / Services / Learn)
 │   │   │   ├── Recorder.jsx       # Voice recorder (MediaRecorder API + webm→wav)
-│   │   │   ├── WaveformCard.jsx   # Waveform + spectrum image card (static PNGs)
-│   │   │   ├── InteractiveWaveform.jsx  # Recharts waveform with hover tooltip
-│   │   │   ├── InteractiveSpectrum.jsx  # Recharts spectrum with hover tooltip
-│   │   │   └── RecordingList.jsx  # Grid of recording cards
+│   │   │   ├── CommandRecorder.jsx # 1.5s auto-stop recorder for command classification
+│   │   │   ├── LiveTranscriber.jsx # Mic → AudioContext → 16kHz PCM16 → WS → live transcript
+│   │   │   ├── WaveformCard.jsx
+│   │   │   ├── InteractiveWaveform.jsx
+│   │   │   ├── InteractiveSpectrum.jsx
+│   │   │   └── RecordingList.jsx
 │   │   └── pages/
-│   │       ├── Home.jsx           # Recorder + recent recordings grid
-│   │       └── RecordingDetail.jsx # Interactive waveform/spectrum view + delete
+│   │       ├── Vision.jsx         # `/` — mission, North Star, 11-stage roadmap
+│   │       ├── Services.jsx       # `/services` — index of feature cards
+│   │       ├── services/
+│   │       │   ├── Recordings.jsx # `/services/recordings` — Recorder + RecordingList
+│   │       │   ├── Commands.jsx   # `/services/commands` — CommandRecorder
+│   │       │   └── STT.jsx        # `/services/stt` — LiveTranscriber
+│   │       ├── Learn.jsx          # `/learn`
+│   │       └── RecordingDetail.jsx # `/recordings/:id` — interactive waveform/spectrum + delete
 │   ├── tailwind.config.js         # Design system
 │   └── vite.config.js             # Vite config with API proxy to :8000
 ├── .env                           # Secrets (gitignored)
@@ -97,6 +108,13 @@ Requires a `.env` file at the project root (copy `.env.sample`).
 - Waveform and spectrum PNGs stored as base64 in MongoDB alongside recording metadata
 - Full CRUD: create (upload + plot), list (paginated), get single, delete
 
+### Realtime Speech-to-Text (complete — productized via OpenAI Realtime)
+- WebSocket endpoint at `/api/v1/stt` proxies to `wss://api.openai.com/v1/realtime?intent=transcription` using `gpt-4o-transcribe` with server-side VAD.
+- Client (`LiveTranscriber.jsx`) captures mic via `getUserMedia`, pulls float32 frames through an `AudioContext` + `ScriptProcessorNode`, downsamples to 16 kHz mono, converts to PCM16, base64-encodes, and ships each frame as `{type: "audio", data}` over the WS.
+- Server forwards frames as `input_audio_buffer.append` events and streams back `{type: "delta"}` (partial) and `{type: "final"}` (committed on VAD pause).
+- Page lives at `/services/stt`. Key is read from `OPENAI_API_KEY` in `.env` — never exposed to the browser.
+- This is a productized shortcut so the platform has STT today; the from-scratch speech recognition research (CTC, seq2seq, Whisper fine-tuning) is a separate upcoming stage.
+
 ### Interactive Charts (complete — Stage 1)
 - Detail page renders interactive Recharts charts with hover tooltips
 - Waveform tooltip shows exact time (s) and amplitude at cursor position
@@ -126,10 +144,15 @@ Requires a `.env` file at the project root (copy `.env.sample`).
 - Currently `allow_origins=["*"]` for development. Tighten for production.
 
 ### API Design
-- All endpoints under `/api/v1/recordings`.
+- REST endpoints under `/api/v1/recordings` and `/api/v1/predictions`. WebSocket at `/api/v1/stt`.
 - Audio upload via multipart form data (`UploadFile`).
 - Waveform and spectrum stored as base64 in the MongoDB document (no separate file storage for now). Downsampled JSON chart data stored alongside for interactive rendering.
-- Vite dev server proxies `/api` to FastAPI on port 8000 (uses `127.0.0.1` to avoid IPv6 resolution issues).
+- Vite dev server proxies `/api` to FastAPI on port 8000 with `ws: true` so WebSocket upgrades pass through (uses `127.0.0.1` to avoid IPv6 resolution issues).
+
+### Frontend Information Architecture
+- Three top-level areas in the navbar: **Vision** (`/`), **Services** (`/services/*`), **Learn** (`/learn`).
+- Vision is marketing/roadmap — no functional tooling.
+- Each research stage ships as its own service page under `/services/<name>`. New modules should follow this pattern: add a page at `client/src/pages/services/<Name>.jsx`, register the route in `App.jsx`, and add a card to `Services.jsx`.
 
 ## Conventions
 
