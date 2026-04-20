@@ -19,6 +19,24 @@ export const NOTEBOOKS = [
     notebookPath: "DL/Day1/day1.ipynb",
     estimatedMinutes: 45,
   },
+  {
+    id: "day3",
+    title: "Your First Speech-to-Text Model",
+    description:
+      "Train your first end-to-end speech recognizer. Learn CTC loss, align audio frames to characters without per-frame labels, and decode model outputs into text.",
+    day: 3,
+    difficulty: "intermediate",
+    workInProgress: true,
+    topics: [
+      "CTC Loss",
+      "Character-level ASR",
+      "Sequence Alignment",
+      "Greedy Decoding",
+      "PyTorch",
+    ],
+    notebookPath: "DL/Day3/ctc_loss.ipynb",
+    estimatedMinutes: 60,
+  },
 ];
 
 export function getGitHubUrl(notebookPath) {

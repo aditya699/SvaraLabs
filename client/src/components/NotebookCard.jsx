@@ -9,7 +9,7 @@ const difficultyStyles = {
 };
 
 export default function NotebookCard({ notebook, index = 0 }) {
-  const { title, description, day, difficulty, topics, notebookPath, estimatedMinutes } =
+  const { title, description, day, difficulty, topics, notebookPath, estimatedMinutes, workInProgress } =
     notebook;
 
   return (
@@ -34,6 +34,11 @@ export default function NotebookCard({ notebook, index = 0 }) {
         >
           {difficulty}
         </span>
+        {workInProgress && (
+          <span className="text-xs font-medium px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+            Work in progress
+          </span>
+        )}
         <span className="flex items-center gap-1 text-xs text-brown-muted ml-auto">
           <Clock className="w-3 h-3" />
           ~{estimatedMinutes} min
