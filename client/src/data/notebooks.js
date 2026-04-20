@@ -26,7 +26,6 @@ export const NOTEBOOKS = [
       "Train your first end-to-end speech recognizer. Learn CTC loss, align audio frames to characters without per-frame labels, and decode model outputs into text.",
     day: 3,
     difficulty: "intermediate",
-    workInProgress: true,
     topics: [
       "CTC Loss",
       "Character-level ASR",
@@ -35,6 +34,24 @@ export const NOTEBOOKS = [
       "PyTorch",
     ],
     notebookPath: "DL/Day3/ctc_loss.ipynb",
+    estimatedMinutes: 60,
+  },
+  {
+    id: "rnn",
+    title: "RNNs for Audio",
+    description:
+      "Understand recurrent neural networks from first principles and apply them to sequential audio data. A stepping stone toward sequence-to-sequence speech recognition.",
+    day: 4,
+    difficulty: "intermediate",
+    workInProgress: true,
+    topics: [
+      "RNN Fundamentals",
+      "Sequence Modeling",
+      "Hidden States",
+      "BPTT",
+      "PyTorch",
+    ],
+    notebookPath: "DL/RNN/RNN_WIP.ipynb",
     estimatedMinutes: 60,
   },
 ];

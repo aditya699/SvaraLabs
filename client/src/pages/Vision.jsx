@@ -14,7 +14,7 @@ const itemVariants = {
 
 const stages = [
   { title: "Audio fundamentals", desc: "Waveform capture, frequency analysis, DFT/FFT from scratch.", status: "done" },
-  { title: "Signal processing", desc: "STFT, mel spectrograms, MFCCs — all in numpy.", status: "in-progress" },
+  { title: "Signal processing", desc: "STFT, mel spectrograms, MFCCs — all in numpy.", status: "done" },
   { title: "Deep learning on audio", desc: "CNNs and RNNs on spectrograms, phoneme classification.", status: "in-progress" },
   { title: "Speech recognition", desc: "CTC loss, seq2seq, Whisper fine-tuning.", status: "in-progress" },
   { title: "Self-supervised representations", desc: "Wav2Vec, HuBERT-style audio embeddings.", status: "upcoming" },
