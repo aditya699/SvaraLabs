@@ -43,7 +43,6 @@ export const NOTEBOOKS = [
       "Understand recurrent neural networks from first principles and apply them to sequential audio data. A stepping stone toward sequence-to-sequence speech recognition.",
     day: 4,
     difficulty: "intermediate",
-    workInProgress: true,
     topics: [
       "RNN Fundamentals",
       "Sequence Modeling",
@@ -51,7 +50,7 @@ export const NOTEBOOKS = [
       "BPTT",
       "PyTorch",
     ],
-    notebookPath: "DL/RNN/RNN_WIP.ipynb",
+    notebookPath: "DL/RNN/RNN.ipynb",
     estimatedMinutes: 60,
   },
 ];
